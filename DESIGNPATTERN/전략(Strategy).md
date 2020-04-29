@@ -167,6 +167,10 @@ public class MiniDuckSimulator {
     mallard.performQuack();
     mallard.performFly();
     
+    /*
+     * 실행 중에 오리의 행동을 바꾸고 싶으면 원하는 행동에 해당하는
+     * Duck 의 Setter 메서드를 호출하면 된다.
+     */
     Duck model = new ModelDuck();
     model.performFly();
     model.setFlyBehavior(new FlyRocketPowered();
