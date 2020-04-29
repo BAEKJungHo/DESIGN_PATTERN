@@ -13,7 +13,7 @@
 
 > 즉, `전략 알고리즘 인터페이스 생성` > `구현체 생성` > `전략 객체 사용` 으로 나뉜다.
 
-## Strategy Example
+## Strategy Example 1
 
 예를 들어 오직 소문자 또는 숫자로 이루어져야 하는 텍스트 입력이 다양한 조건에 맞게 포맷 되었는지 검증하는 예제
 
@@ -58,11 +58,119 @@ Validator lowerCaseValidator = new Validator(new IsAllLowerCase());
 boolean b2 = lowerCaseValidator.validate("bbbb"); // true
 ```
 
-## 람다 표현식으로 리팩토링
+### 람다 표현식으로 리팩토링
 
 ```java
 Validator numericValidator = new Validator((String s) -> s.matches("[a-z]+"));
 boolean b1 = numericValidator.validate("aaaa");
 Validator lowerCaseValidator = new Validator((String s) -> s.matches("\\d+"));
 boolean b2 = lowerCaseValidator.validate("bbbb");
+```
+
+## Strategy Example 2
+
+- 슈퍼 클래스
+
+```java
+public abstract class Duck {
+  FlyBehavior flyBehavior;
+  QuackBehavior quackBehavior;
+  
+  public Duck() {}
+  
+  public abstract void display();
+  
+  public void perfromFly() {
+    flyBehavior.fly();
+  }
+  
+  public void performQuack() {
+    quackBehavior.quack();
+  }
+  
+  public void swim() {
+    System.out.println("모든 오리는 물에 뜬다. 가짜 오리도 뜬다.");
+  }
+  
+  // 오리의 행동을 동적으로 지정하기 위한 set 메서드
+  public void setFlyBehavior(FlyBehavior flyBehavior) {
+    this.flyBehavior = flyBehavior;
+  }
+  
+  public void setQuackBehavior(QuackBehavior quackBehavior) {
+    this.quackBehavior = quackBehavior;
+  }
+}
+```
+
+- FlyBehavior 인터페이스와 
+
+```java
+public interface FlyBehavior {
+  public void fly();
+}
+
+public class FlyWithWings implements FlyBehavior {
+  public void fly() {
+    System.out.println("날고 있어요!!");
+  }
+}
+
+public class FlyNoWay implements FlyBehavior {
+  public void fly() {
+    System.out.println("저는 못 날아요");
+  }
+}
+```
+
+- QuackBehavior 인터페이스와 구현체
+
+```java
+public interface QuackBehavior {
+  public void quack();
+}
+
+public class Quack implements QuackBehavior {
+  public void quack() {
+    System.out.println("꽥");  
+  }
+}
+
+public class MuteQuack implements QuackBehavior {
+  public void quack() {
+    System.out.println("조용");
+  }
+}
+```
+
+- 서브 클래스
+
+```java
+public class ModelDuck extends Duck {
+  public ModelDuck() {
+    flyBehavior = new FlyNoWay();
+    quackBehavior = new Quack();
+  }
+  
+  public void display() {
+    System.out.println("저는 모형 오리입니다.");
+  }
+}
+```
+
+- 테스트 클래스
+
+```java
+public class MiniDuckSimulator {
+  public static void main(String[] args) {
+    Duck mallard = new MallardDuck();
+    mallard.performQuack();
+    mallard.performFly();
+    
+    Duck model = new ModelDuck();
+    model.performFly();
+    model.setFlyBehavior(new FlyRocketPowered();
+    model.perfomFly();
+  }
+}
 ```
