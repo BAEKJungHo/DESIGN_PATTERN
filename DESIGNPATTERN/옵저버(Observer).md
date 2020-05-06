@@ -58,7 +58,7 @@ class Guardian implements Observer {
 }
 ```
 
-- 주제 구현
+- 주제 인터페이스
 
 ```java
 interface Subject {
@@ -70,8 +70,10 @@ interface Subject {
 
 주제는 registerObserver 메서드로 새로운 옵저버를 등록한 다음에 notifyObservers 메서드로 트윗의 옵저버에 이를 알린다.
 
+- 주제 구현
+
 ```java
-calss Feed implements Subject {
+class Feed implements Subject {
   private final List<Observer> observers = new ArrayList<>();
   // 옵저버 등록
   public void registerObserver(Observer o) {
