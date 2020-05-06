@@ -30,7 +30,7 @@
 
 - 옵저버 인터페이스는 새로운 트윗이 있을 때 주제(Feed)가 호출할 수 있도록 notify라고 하는 하나의 메서드를 제공한다.
 
-- Observer Interface
+- 옵저버 인터페이스
 
 ```java
 interface Observer {
