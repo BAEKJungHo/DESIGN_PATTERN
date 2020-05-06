@@ -269,3 +269,212 @@ public class WeatherStation {
   }
 }
 ```
+
+## 자바 내장 옵저버 
+
+java.util.Observable 클래스와 java.util.Observer 인터페이스가 있다. 이 두개는 직접 구현하는것 보다 훨씬 많은 기능을 지원한다. `푸시 방식` 으로
+갱신할 수도 있고, `풀 방식` 으로 갱신할 수도 있다.
+
+- java.util.Observable 
+
+```java
+public class Observable {
+    private boolean changed = false;
+    private Vector<Observer> obs;
+
+    /** Construct an Observable with zero Observers. */
+
+    public Observable() {
+        obs = new Vector<>();
+    }
+
+    /**
+     * Adds an observer to the set of observers for this object, provided
+     * that it is not the same as some observer already in the set.
+     * The order in which notifications will be delivered to multiple
+     * observers is not specified. See the class comment.
+     *
+     * @param   o   an observer to be added.
+     * @throws NullPointerException   if the parameter o is null.
+     */
+    public synchronized void addObserver(Observer o) {
+        if (o == null)
+            throw new NullPointerException();
+        if (!obs.contains(o)) {
+            obs.addElement(o);
+        }
+    }
+
+    /**
+     * Deletes an observer from the set of observers of this object.
+     * Passing <CODE>null</CODE> to this method will have no effect.
+     * @param   o   the observer to be deleted.
+     */
+    public synchronized void deleteObserver(Observer o) {
+        obs.removeElement(o);
+    }
+
+    /**
+     * If this object has changed, as indicated by the
+     * <code>hasChanged</code> method, then notify all of its observers
+     * and then call the <code>clearChanged</code> method to
+     * indicate that this object has no longer changed.
+     * <p>
+     * Each observer has its <code>update</code> method called with two
+     * arguments: this observable object and <code>null</code>. In other
+     * words, this method is equivalent to:
+     * <blockquote><tt>
+     * notifyObservers(null)</tt></blockquote>
+     *
+     * @see     java.util.Observable#clearChanged()
+     * @see     java.util.Observable#hasChanged()
+     * @see     java.util.Observer#update(java.util.Observable, java.lang.Object)
+     */
+    public void notifyObservers() {
+        notifyObservers(null);
+    }
+
+    /**
+     * If this object has changed, as indicated by the
+     * <code>hasChanged</code> method, then notify all of its observers
+     * and then call the <code>clearChanged</code> method to indicate
+     * that this object has no longer changed.
+     * <p>
+     * Each observer has its <code>update</code> method called with two
+     * arguments: this observable object and the <code>arg</code> argument.
+     *
+     * @param   arg   any object.
+     * @see     java.util.Observable#clearChanged()
+     * @see     java.util.Observable#hasChanged()
+     * @see     java.util.Observer#update(java.util.Observable, java.lang.Object)
+     */
+    public void notifyObservers(Object arg) {
+        /*
+         * a temporary array buffer, used as a snapshot of the state of
+         * current Observers.
+         */
+        Object[] arrLocal;
+
+        synchronized (this) {
+            /* We don't want the Observer doing callbacks into
+             * arbitrary code while holding its own Monitor.
+             * The code where we extract each Observable from
+             * the Vector and store the state of the Observer
+             * needs synchronization, but notifying observers
+             * does not (should not).  The worst result of any
+             * potential race-condition here is that:
+             * 1) a newly-added Observer will miss a
+             *   notification in progress
+             * 2) a recently unregistered Observer will be
+             *   wrongly notified when it doesn't care
+             */
+            if (!changed)
+                return;
+            arrLocal = obs.toArray();
+            clearChanged();
+        }
+
+        for (int i = arrLocal.length-1; i>=0; i--)
+            ((Observer)arrLocal[i]).update(this, arg);
+    }
+
+    /**
+     * Clears the observer list so that this object no longer has any observers.
+     */
+    public synchronized void deleteObservers() {
+        obs.removeAllElements();
+    }
+
+    /**
+     * Marks this <tt>Observable</tt> object as having been changed; the
+     * <tt>hasChanged</tt> method will now return <tt>true</tt>.
+     */
+    protected synchronized void setChanged() {
+        changed = true;
+    }
+
+    /**
+     * Indicates that this object has no longer changed, or that it has
+     * already notified all of its observers of its most recent change,
+     * so that the <tt>hasChanged</tt> method will now return <tt>false</tt>.
+     * This method is called automatically by the
+     * <code>notifyObservers</code> methods.
+     *
+     * @see     java.util.Observable#notifyObservers()
+     * @see     java.util.Observable#notifyObservers(java.lang.Object)
+     */
+    protected synchronized void clearChanged() {
+        changed = false;
+    }
+
+    /**
+     * Tests if this object has changed.
+     *
+     * @return  <code>true</code> if and only if the <code>setChanged</code>
+     *          method has been called more recently than the
+     *          <code>clearChanged</code> method on this object;
+     *          <code>false</code> otherwise.
+     * @see     java.util.Observable#clearChanged()
+     * @see     java.util.Observable#setChanged()
+     */
+    public synchronized boolean hasChanged() {
+        return changed;
+    }
+
+    /**
+     * Returns the number of observers of this <tt>Observable</tt> object.
+     *
+     * @return  the number of observers of this object.
+     */
+    public synchronized int countObservers() {
+        return obs.size();
+    }
+}
+```
+
+- java.util.Observer
+
+```java
+public interface Observer {
+    /**
+     * This method is called whenever the observed object is changed. An
+     * application calls an <tt>Observable</tt> object's
+     * <code>notifyObservers</code> method to have all the object's
+     * observers notified of the change.
+     *
+     * @param   o     the observable object.
+     * @param   arg   an argument passed to the <code>notifyObservers</code>
+     *                 method.
+     */
+    void update(Observable o, Object arg);
+}
+```
+
+직접 생성하는것과 update 메서드가 다른데, arg 파라미터를 추가로 받는것을 볼 수 있다. 
+
+java 에서 지원하는 Observable 과 Observer 를 사용하는 경우 아래와 같은 방식으로 진행된다.
+
+- `객체의 옵저버가 되는 방법`
+  - java.util.Observer 인터페이스를 구현하고 Observable 객체의 addObserver() 메서드를 호출하면된다.
+  - 탈퇴하고 싶은 경우는 deleteObserver() 를 호출하면 된다.
+- `Observable 에서 연락을 돌리는 방법`
+  - 첫 번째로 setChanged() 메서드를 호출해서 객체의 상태가 바뀌었다는 것을 알린다.
+  - 그 다음으로 다음 중 하나의 메서드를 호출해야 한다.
+    - notifyObservers() 
+    - notifyObservers(Object arg) 
+      - 이 버전에서는 연락할 때 각 옵저버 객체한테 전달할 임의의 데이터 객체를 받아들인다.
+
+- `푸시 방식`
+  - 데이터를 옵저버들한테 보낼 때는 데이터를 notifyObservers(arg) 메서드의 인자로 전달하는 데이터 객체 형태로 전달해야 한다.
+- `풀 방식`
+  - 옵저버 쪽에서 전달받은 Observable 객체로부터 원하는 데이터를 가져가는 방식
+  
+java.util.Observable 클래스를 보면 `setChanged()` 메서드의 역할은 연락을 최적화할 수 있게 해준다. 예를들어 온도 센서가 민감해서 0.1 도 단위로 바뀌는 경우 매번 연락을 돌리는 것보다, 0.5 단위로 돌리고 싶은 경우도 있을텐데 이때 setChanged() 가 그 역할을 해준다. `clearChanged()` 는 다시 상태를 false 로 바꾼다. `hasChanged()` 는 현재 상태를 확인한다.
+
+- 단점
+  - Observable 은 클래스여서 재사용성이 떨어지게 된다.(옵저버 패턴의 가장 큰 장점이 재사용성이다.)
+  - Observable 인터페이스가 없기 때문에 java.util 구현을 다른 구현으로 바꾸는 것이 불가능하다.
+  - Observable 내부를 보면 메서드들이 synchronized 로 되어있어서 멀티스레드로 구현하는것은 아예 불가능하다.
+  - Observable 클래스의 핵심 메서드를 외부에서 호출할 수 없다. setChanged() 메서드가 protected 로 되어있어서 서브 클래스에서만 호출할 수 있다.
+
+
