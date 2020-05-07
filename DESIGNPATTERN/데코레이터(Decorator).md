@@ -25,3 +25,84 @@
   - 데코레이터는 자신이 감싸고 있는 객체와 같은 상위클래스를 가지고 있기 대문에 원래 객체가 들어갈 자리에 데코레이터 객체를 집어넣어도 상관 없다.
   - 데코레이터는 자신이 장식하고 있는 객체에게 어떤 행동을 위임하는 것 외에 원하는 추가적인 작업을 수행할 수 있다.
   - 객체는 언제든지 감쌀 수 있기 때문에 실행중에 필요한 데코레이터를 마음대로 적용할 수 있다.
+
+- Beverage 클래스
+
+```java
+public abstract class Beverage {
+  String description = "제목없음";
+  
+  public String getDescription() {
+    return description;
+  }
+  
+  public abstract double cost();
+} 
+```
+
+- 첨가물 데코레이터(추상클래스)
+
+```java
+/**
+ * Beverage 객체가 들어갈 자리에 들어갈 수 있어야 하므로 Beverage 확장
+ */
+public abstract class CondimentDecorator extends Beverage {
+  /**
+   * 모든 첨가물 데코레이터에서 getDescription() 메서드를 새로 구현해야 한다.
+   */
+  public abstract String getDescription();
+}
+```
+
+- 음료 코드 구현
+  - 음료를 설명하는 문자열을 설정해야 하고 cost() 메서드를 구현해야 한다.
+
+```java
+public class Espresso extends Beverage {
+  public Espresso() {
+    description = "에스프레소";
+  }
+  
+  public double cost() {
+    return 1.99;
+  }
+}
+
+public class HouseBlend extends Beverage {
+  public HouseBlend() {
+    description = "하우스 블랜드 커피";
+  }
+  
+  public double cost() {
+    return .89;
+  }
+}
+```
+
+- 첨가물용 코드 구현(데코레이터 구현체)
+
+```java
+public class Mocha extends CondimentDecorator {
+  // 감싸고자 하는 음료를 저장하기 위한 변수
+  Beverage beverage; 
+  
+  /**
+   * 데코레이터 생성자에 감싸고자 하는 객체로 설정하기 위한 생성자
+   * 데코레이터의 생성자에 감싸고자 하는 음료 객체를 전달하는 방식을 사용
+   */ 
+  public Mocha(Beverage beverage) {
+    this.beverage = beverage;
+  }
+  
+  public String getDescription() {
+    return beverage.getDescription() + ", 모카";
+  }
+  
+  /**
+   * 음료 가격에 Mocha 가격을 
+   */
+  public double cost() {
+    return .20 + beverage.cost();
+  }
+}
+```
