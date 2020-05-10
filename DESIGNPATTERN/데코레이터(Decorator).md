@@ -106,3 +106,28 @@ public class Mocha extends CondimentDecorator {
   }
 }
 ```
+
+- 테스트 코드
+
+```java
+public class StarbuzzCoffee {
+  public static void main(String[] args) {
+    Beverage beverage = new Espresso();
+    System.out.println(beverage.getDescription());
+    
+    Beverage beverage2 = new DarkRoast();
+    beverage2 = new Mocha(beverage2); // Mocha 추가
+    beverage2 = new Mocha(beverage2); // Mocha 하나 더 추가
+    beverage2 = new Whip(beverage2); // Whip 휘핑크림 추가
+    System.out.println(beverage2.getDescription() + " " + beverage2.cost());
+  }
+}
+```
+
+## 데코레이터 특징
+
+데코레이터를 빼먹는 실수를 할 우려가 있으므로, 데코레이터 패턴은 주로 팩토리나 빌더 패턴을 써서 만들고 사용한다.
+
+## 자바에서 데코레이터를 사용하는 예 : 자바 I/O
+
+`LineNumberInputStream > BufferedInputStream > FileInputStream`
