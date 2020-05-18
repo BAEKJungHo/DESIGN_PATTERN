@@ -9,7 +9,8 @@
 전략 패턴은 세 부분으로 구성된다.
 
 - 알고리즘을 나타내는 인터페이스(Strategy Interface)
-- 다양한 알고리즘을 나타내는 한 개 이상의 인터페이스 구현(ConcreteStrategyA, ConcreteStrategyB 같은 구체적인 구현 클래스)
+- 다양한 알고리즘을 나타내는 한 개 이상의 인터페이스 구현
+  - Ex). ConcreteStrategyA, ConcreteStrategyB 같은 구체적인 구현 클래스
 - 전략 객체를 사용하는 한 개 이상의 클라이언트
 
 > 즉, `전략 알고리즘 인터페이스 생성` > `구현체 생성` > `전략 객체 사용` 으로 나뉜다.
