@@ -14,7 +14,7 @@
 
 > 즉, `전략 알고리즘 인터페이스 생성` > `구현체 생성` > `전략 객체 사용` 으로 나뉜다.
 
-## Strategy Example 1
+## Example 1
 
 예를 들어 오직 소문자 또는 숫자로 이루어져야 하는 텍스트 입력이 다양한 조건에 맞게 포맷 되었는지 검증하는 예제
 
@@ -68,7 +68,7 @@ Validator lowerCaseValidator = new Validator((String s) -> s.matches("\\d+"));
 boolean b2 = lowerCaseValidator.validate("bbbb");
 ```
 
-## Strategy Example 2
+## Example 2
 
 - 슈퍼 클래스
 
@@ -179,3 +179,39 @@ public class MiniDuckSimulator {
   }
 }
 ```
+
+## Example 3
+
+- 동작 파라미터화 예제
+
+사과의 어떤 속성에 기초해서 불리언 값을 반환(예를 들어 사과가 녹색인가? 150그램 이상인가?). 참 또는 거짓을 반환하는 함수를 `프레디케이트` 라고 한다.
+
+`선택 조건을 결정하는 인터페이스`를 정하자.
+
+```java
+public interface ApplePredicate {
+  boolean test (Apple apple);
+}
+```
+
+다음 예제 처럼 다양한 선택 조건을 대표하는 여러 버전의 ApplePredicate를 정의할 수 있다.
+
+```java
+public class AppleHeavyWeightPredicate implements ApplePredicate {
+  public boolean test(Apple apple) {
+    return apple.getWeight() > 150;
+  }
+}
+
+public class AppleGreenColorPredicate implements ApplePredicate {
+  public boolean test(Apple apple) {
+    return GREEN.equals(apple.getColor());
+  }
+}
+```
+
+위 조건에 따라 filter 메서드가 다르게 동작할 것이라고 예상할 수 있다. 이를 `전략 디자인패턴(strategy design patter)`이라고 부른다.
+
+전략 디자인 패턴은 각 알고리즘(전략이라 부르는)을 캡슐화 하는 알고리즘 패밀리를 정의해둔 다음에 런타임에 알고리즘을 선택하는 기법이다.
+
+여기서는 ApplePredicate가 `알고리즘 패밀리` 이며, 이를 구현한 클래스들이 `전략` 이다.
