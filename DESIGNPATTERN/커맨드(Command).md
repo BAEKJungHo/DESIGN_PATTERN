@@ -12,13 +12,37 @@
 - 구성
   - 클라이언트(Client) : ConcreteCommand 를 생성하고 Receiver 를 설정한다.
   - 인보커(Invoker) : 인보커에는 명령이 들어 있으며, execute() 메서드를 호출함으로써 커맨드 객체에 특정 작업을 수행해 달라는 요구를 하게 된다.
-  - 커맨드 인터페이스(Command Interface) : Command 는 모든 커맨드 객체에서 구현해야 하는 인터페이스이다. 모든 명령은 execute() 메서드 호출을 통해 
-  수행되고, 이 메서드에서는 리시버에 특정 작업을 처리하라는 지시를 전달한다.
+  - 커맨드 인터페이스(Command Interface) : Command 는 모든 커맨드 객체에서 구현해야 하는 인터페이스이다. 모든 명령은 execute() 메서드 호출을 통해 수행되고, 이 메서드에서는 리시버에 특정 작업을 처리하라는 지시를 전달한다.
     - execute()
     - undo()
-  - 커맨드 구현체(Concrete Command) : 특정 행동과 리시버 사이를 연결해 준다. 인보커에서 execute() 호출을 통해 요청을 하면 ConcreteCommand 객체에서
-  리시버에 있는 메서드를 호출하여 작업을 처리한다.
+  - 커맨드 구현체(Concrete Command) : 특정 행동과 리시버 사이를 연결해 준다. 인보커에서 execute() 호출을 통해 요청을 하면 ConcreteCommand 객체에서 리시버에 있는 메서드를 호출하여 작업을 처리한다.
   - 리시버(Receiver) : 리시버는 요구 사항을 수행하기 위해 어떤 일을 처리해야 하는지 알고 있는 객체이다.
+  
+  - 리시버
+  
+  ```java
+  public void Receiver {
+    Command command;
+    
+    public void Receiver() {}
+    
+    public void setCommand(Command command) {
+      this.command = command;    
+    }
+    
+    public void xxx() {
+      command.execute();
+    }
+  }
+  ```
+  
+  - 커맨드 구현체의 execute() 가 바로 `캡슐화된 요구사항` 이다. 
+  
+  ```java
+  public void execute() {
+    receiver.action();
+  }
+  ```
   
 ## Example 1
 
@@ -42,6 +66,48 @@ public class LightOnCommand implements Command {
   
   public void execute() {
     light.on();
+  }
+}
+```
+
+- 버튼이 하나 밖에 없는 리모콘
+
+```java
+public class SimpleRemoteControl {
+  Command slot;
+  
+  public SimpleRemoteControl() { }
+  
+  public void setCommand(Command command) {
+    slot = command;
+  }
+  
+  public void buttonWasPressed() { 
+    slot.execute();
+  }
+}
+```
+
+- 테스트 클래스
+
+```java
+public class RemoteControlTest {
+  public static void main(String[] args) {
+    /*
+     * remote 변수는 인보커 역할을 한다.
+     * 필요한 작업을 요청할 때 사용할 커맨드 객체를 인자로 전달 받는다.
+     */
+    SimpleRemoteControl remote = new SimplRemoteControl();
+    
+    // 요청을 받아서 처리할 리시버(receiver) 객체
+    Light light = new Light();
+    
+    LightOnCommand lightOn = new LightOnCommand(light);
+    
+    // 커맨드 객체를 인보커에 전달
+    remote.setCommand(lightOn);
+    
+    remote.buttonWasPressed();
   }
 }
 ```
