@@ -83,7 +83,6 @@ public class HomeTheaterFacade {
     dvd.eject();
     dvd.off();
   }
-  
 }
 ```
 
@@ -98,6 +97,5 @@ public class HomeTeaterTestDrive {
     homeTeater.watchMovie("Raiders of the Lost Ark");
     homeTeater.endMove();
   }
-
 }
 ```
