@@ -94,3 +94,41 @@ public class TurkeyAdapter implements Duck {
   
 }
 ```
+
+## Example 2
+
+Enummeration 과 Iterator 를 연결하는 어댑터 클래스 만들기
+
+- Iterator (타겟)
+  - hasNext()
+  - next()
+  - remove()
+- Enummeration
+  - hasMoreElements()
+  - nextElement()
+
+메서드 구성을 보니 remove() 가 Enummeration 에는 존재하지 않아서 어댑터 클래스를 만들어야 한다.
+
+- 어댑터
+
+```java
+public class EnummerationIterator implements Iterator {
+  Enummeration enum;
+  
+  public EnumerationIterator(Enumeration enum) {
+    this.enum = enum;
+  }
+  
+  public boolean hasNext() {
+    return enum.hasMoreElements();
+  }
+  
+  public Object next() {
+    return enum.nextElement();
+  }
+  
+  public void remove() {
+    throw new UnsupportedOperationException();
+  }
+}
+```
