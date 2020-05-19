@@ -203,7 +203,7 @@ public class NYStyleCheesePizza extends Pizza {
 public class PizzaTestDrive {
   public static void main(String[] args) {
     PizzaStore nyStore = new NYPizzaStore();
-    PizzaStore = chicagoStore = new ChicagoPizzaStore();
+    PizzaStore chicagoStore = new ChicagoPizzaStore();
     
     Pizza pizza = nyStore.oredrPizza("cheese");
     System.out.println("Ethan ordered a " + pizza.getName());
