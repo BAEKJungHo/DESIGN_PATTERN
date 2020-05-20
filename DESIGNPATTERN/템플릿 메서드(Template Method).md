@@ -103,6 +103,7 @@ public abstract class CaffeineBeverage {
 
 ```java
 public class Coffee extends CaffeineBeverage {
+  
   // 생략
   
   // hook
