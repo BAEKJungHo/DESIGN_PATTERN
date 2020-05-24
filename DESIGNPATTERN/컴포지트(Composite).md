@@ -175,6 +175,7 @@ public class MenuTestDrive {
 
 복합 객체 안에 들어있는 MenuItem 에 대해 반복작업을 할 수 있게 해주는 기능을 제공한다.
 
+```java
 public class CompositeIterator implements Iterator {
   Stack stack = new Stack();
   
@@ -210,6 +211,28 @@ public class CompositeIterator implements Iterator {
   
   public void remove() {
     throw new UnsupportedOperationException();
+  }
+}
+```
+
+- 널 반복자
+
+MenuItem 에 대해 생각해 보면, 반복작업을 할 대상이 없을 수도 있다. 
+
+따라서 hasNext() 가 호출되었을 때, 무조건 false 를 리턴하는 반복자를 리턴한다.
+
+```java
+public class NullIterator implements Iterator {
+  public Object next() {
+    return null;
+  }
+  
+  public boolean hasNext() {
+    return false;
+  }
+  
+  public void remove() {
+    throw new UnsupportedOperationException();  
   }
 }
 ```
