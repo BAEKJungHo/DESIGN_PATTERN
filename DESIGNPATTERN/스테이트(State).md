@@ -28,6 +28,7 @@ public interface State {
 
 ```java
 public class NoQuarterState implements State {
+
   GumballMachine gumballMachine;
   
   public NoQuarterState(GumballMachine gumballMachine) {
@@ -57,6 +58,7 @@ public class NoQuarterState implements State {
 
 ```java
 public class HasQuarterState implements State {
+
   GumballMachine gumballMachine;
   
   public HasQuarterState(GumballMachine gumballMachine) {
@@ -88,6 +90,7 @@ public class HasQuarterState implements State {
 
 ```java
 public class GumballMachine {
+
   State soldOutState;
   State noQuarterState;
   State hasQuarterState;
