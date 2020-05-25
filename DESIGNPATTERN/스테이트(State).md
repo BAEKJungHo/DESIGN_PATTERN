@@ -8,10 +8,10 @@
 
 ## 구성
 
-- Context (GumballMachine)
-  - state.handle();
-- State Interface
-- ConcreteStateA, B, C ...
+- `Context`
+  - `state.handle();`
+- `State Interface`
+- `ConcreteStateA, B, C ...`
 
 ## Example 1
 
@@ -93,7 +93,7 @@ public class HasQuarterState implements State {
 }
 ```
 
-- GumballMachine
+- GumballMachine(Context)
 
 ```java
 public class GumballMachine {
