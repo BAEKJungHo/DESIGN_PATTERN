@@ -75,6 +75,10 @@ public class PropertyValidator {
 }
 ```
 
+```java
+PropertyValidator.requiredValueValidate("seq", "기본키는 빈 값이 올 수 없습니다.");
+```
+
 ## How
 
 - 어떤 조건이 참으로 전제된다면 어설션을 넣어 그 전제를 드러내자
