@@ -342,7 +342,6 @@ public class GumballMonitorTestDrive {
     for(int i=0; i<monitor.length; i++) {
       monitor[i].report();
     }
-  
   }
 
 }
