@@ -249,3 +249,101 @@ public class NoQuarterState implements State {
   transient GumballMachine gumballMachine;
 }
 ```
+
+GumballMachine 을 서비스 역할을 할 수 있도록, 그리고 네트워크를 통해 들어온 요청을 처리할 수 있도록 고쳐야 한다.
+
+```java
+import java.rmi.*;
+import java.rmi.server.*;
+
+public class GumballMachine extends UnicastRemoteObject implements GumballMachineRemote {
+  
+  public GumballMachine(Strin location, int numberGumballs) throws RemoteExcpetion {
+  
+  }
+  
+  // 생략
+}
+```
+
+- RMI 레지스트리 등록
+
+```java
+public class GumballMachineTestDrive {
+  public static void main(String[] args) {
+    GumballMachineRemote remote = null;
+    int count;
+    if(args.length < 2) {
+      System.out.println("GumballMachine <name> <inventory>");
+      System.exit(1);
+    }
+    
+    try {
+      count = Integer.parseInt(args[1]);
+      gumballMachine = new GumballMachine(args[0], count);
+      Naming.rebind("//" + args[0] + "/gumballMachine", gumballMachine);
+  } catch(Exception e) {
+    e.printStackTrace();
+  }
+
+}
+```
+
+- 테스트 클래스 실행
+  - %rmiregistry
+  -% java GumballMachineTestDrive seattle.mightygumball.com 100
+  
+- GumballMonitor 클라이언트 수정
+
+```java
+import java.rmi.*;
+
+public class GumballMonitor {
+  GumballMachineRemote machine;
+  
+  public GumballMonitor(GumballMachineRemote machine) {
+    this.machine = machine;
+  }
+  
+  public void report() {
+    try {
+      // 생략
+    } catch(RemoteException e) {
+      e.printStackTrace();
+    }
+  }
+
+}
+```
+
+- 모니터링 클래스
+
+```java
+import java.rmi.*;
+
+public class GumballMonitorTestDrive {
+  public static void main(String[] args) {
+    String[] location = {"rmi://santafe.mightygumball.com/gumballmachine",
+              "rmi://boulder.mightygumball.com/gumballmachine",
+              "rmi://seattle.mightygumball.com/gumballmachine"};
+              
+    GumballMonitor[] monitor = new GumballMonitor[location.lenght];
+    
+    for(int i=0; i<location.length; i++) {
+      try {
+        GumballMachineRemote machine = (GumballMachineRemote) Naming.lookup(location[i]);
+        monitor[i] = new GumballMonitor(machine);
+        System.out.println(monitor[i]);
+      } catch(Exception e) {
+        e.printStackTrace();
+      }
+    }
+    
+    for(int i=0; i<monitor.length; i++) {
+      monitor[i].report();
+    }
+  
+  }
+
+}
+```
