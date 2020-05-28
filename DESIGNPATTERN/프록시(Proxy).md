@@ -236,3 +236,16 @@ public interface State extends Serializable {
   public void dispense();
 }
 ```
+
+아직 Serializable 과 관련된 문제가 완전히 해결되진 않았다. 모든 State 객체에는 뽑기 기계의 메서드를 호출하거나 상태를 변경할 때 사용하기 위한 뽑기 기계에 대한 래퍼런스가 들어있다. 하지만 State 객체가 직렬화되어 전송될 때 뽑기 기계도 전부 직렬화 시켜서 같이 보내는 것은 바람직하지 않다. 이 문제는 아래와 같이 해결할 수 있다.
+
+```java
+public class NoQuarterState implements State {
+
+  /**
+   * 직렬화하고 싶지 않은 필드의 경우 transient 키워드로 해결할 수 있다.
+   * 하지만 객체를 직렬화 해서 전송받은 후에 이 필드를 호출하게되면 안 좋은 상황이 생길 수 있다.
+   */
+  transient GumballMachine gumballMachine;
+}
+```
