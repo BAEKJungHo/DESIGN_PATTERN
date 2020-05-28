@@ -72,6 +72,8 @@ RMI 에서 클라이언트 보조 객체는 `스터브(stub)`, 서비스 보조 
  
  그 이유는, 모두 네트워크를 통해서 전달되기 때문에 직렬화를 통해 포장된다. 리턴값도 마찬가지이다. 원시 형식이나 API 에서 많이 사용하는 배열, 컬렉션형식을 사용한다면 걱정을 안해도 되지만, 직접 만든 형식일 경우 클래스를 만들 때 Serializable 인터페이스를 꼭 구현해야 한다.
  
+> 즉, 직렬화(Serializable) 를 한다는 것은 네트워크 전송을 한다는 것이다.
+ 
  ```java
  public String sayHello() throws RemoteException;
  ```
@@ -202,5 +204,35 @@ public class MyRemoteClient {
     }
   }
   
+}
+```
+
+#### GumballMachine 을 원격 서비스로 개조하는 방법
+
+원격 프록시를 쓸 수 있도록 코드를 개조할 때 가장 먼저 할 일은 GumballMachine 을 클라이언트로부터 전달된 원격 요청에 대한 서비스를 제공할 수 있는 방식으로 개조하는 것입니다. 즉, 서비스를 구현한 클래스로 만들어야 한다.
+
+- GumballMachine 용 원격 인터페이스 만들기. 이 인터페이스에서는 원격 클라이언트에서 호출할 수 있는 메서드들을 정의해야 한다.
+- 인터페이스의 모든 리턴 형식이 직렬화할 수 있는 형식인지 확인
+- 구상 클래스에서 인터페이스 구현
+
+```java
+import java.rmi.*;
+
+public interface GmballMachineRemote extends Remote {
+  public int getCount() throws RemoteException;
+  public String getLocation() throws RemoteException;
+  public State getState() throws RemoteException;
+}
+```
+
+지원해야 하는 메서드는 모두 throws RemoteException 을 던질 수 있다. 그리고 State 와 같은 형식은 직렬화 가능한 형식으로 변경해야 한다.
+
+```java
+import java.io.*;
+public interface State extends Serializable {
+  public void insertQuarter();
+  public void ejectQuarter();
+  public void turnCrank();
+  public void dispense();
 }
 ```
