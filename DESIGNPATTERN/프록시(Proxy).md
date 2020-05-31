@@ -517,3 +517,58 @@ public class OwnerInfocationHandler implements InvocationHandler {
   }
 }
 ```
+
+- Proxy 클래스를 생성 및 Proxy 객체 인스턴스 만들기
+
+```java
+/**
+ * Person 객체를 받고 프록시를 리턴한다.
+ */
+PersonBean getOwnerProxy(PersonBean person) {
+  /**
+   * newProxyInstance 를 사용하여 프록시 생성
+   * person 의 클래스로더 와 인터페이스를 인자로 전달
+   * 호출 핸들러인 OwnerInvocationHandler 도 전달
+   */
+  return (PersonBean) Proxy.newProxyInstance (
+    person.getClass().getClassLoader(),
+    person.getClass().getInterfaces(),
+    new OwnerInvocationHandler(person));
+}
+```
+
+- 결혼 정보 서비스 테스트
+
+```java
+public class MatchMakingTestDrivce {
+  // 인스턴스 변수 선언
+  
+  public static void main(String[] args) {
+    MatchMakingTestDrive test = new MatchMakingTestDrvie();
+    test.drive();
+  }
+  
+  /**
+   * 생성자에서 결혼 정보 서비스의 회원 데이터베이스를 초기화
+   */
+  public MatchMakingTestDrive() [
+    initializeDatabase();
+  }
+  
+  public void drive() {
+    PersonBean joe = getPersonFromDatabase("Joe Javaben"); // 인물에 대한 정보를 DB 에서 가져온다.
+    PersonBean ownerProxy = getOwnerProxy(joe); // 본인용 프록시 생성
+    System.out.println("Interests set from owner proxy"); // Getter 메서드 호출
+    ownerProxy.setInterests("bowling, Go"); // Setter 메서드 호출
+    try {
+      ownerProxy.setHotOrNotRating(10);
+    } catch(Exception e) {
+      System.out.println("Can't set rating from owner proxy");
+    }
+    System.out.println("Rating is " + ownerProxy.getHotOrNotRating());
+    
+    PersonBean nonOwnerProxy = getNonOwnerProxy(joe); // 타인용 프록시 생성
+    // 위 과정과 동일
+  }
+}
+```
