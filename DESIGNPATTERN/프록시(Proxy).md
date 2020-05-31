@@ -346,3 +346,174 @@ public class GumballMonitorTestDrive {
 
 }
 ```
+
+## 가상 프록시
+
+가상 프록시는 생성하는 데 많은 비용이 드는 객체를 대신하는 역할을 맡는다. 실제로 진짜 객체가 필요하게 되기 전까지 객체의 생성을 미루게 해 주는 기능으 제공하기도 한다. 객체 생성 전, 또는 객체 생성 도중에 객체를 대신하기도 한다. 객체 생성이 완료되고 나면 그냥 RealSubject 에 요청을 직접 전달해 준다.
+
+### Example
+
+- CD 커버 뷰어
+
+CD 커버를 보여주는 뷰어를 만들기로 했다고 가정. CD 타이틀 메뉴를 만든 다음 이미지를 아마존 닷 컴 같은 온라인 서비스로 가져오면 꽤 편하다. 그런데 이 방법을 사용하면 네트워크의 상태와 인터넷 연결 속도에 따라서 오랜 시간이 걸릴 수도 있기 때문에, 이미지를 불러오는 동안 화면에 뭔가 다른 걸 보여주는게 좋다. 가상 프록시를 사용하면 이런 문제를 간단하게 해결할 수 있다. 가상 프록시가 아이콘 대신 백그라운드에서 이미지를 불러오는 작업을 처리하고, 이미지를 완전히 가져오기 까지 "Loading CD cover, please wait ..." 과 같은 메시지를 보여주면 된다. 
+
+따라서 여기서 생성하는 데 많은 비용이 드는 객체는 `아이콘용 데이터를 네트워크를 통해서 가져와야 하는 것` 입니다.
+
+- 작동 방법
+  - ImageProxy 에서는 우선 ImageIcon 을 생성하고 네트워크 URL 로 부터 이미지를 불러온다.
+  - 이미지를 가져오는 동안에는 "Loading CD cover, please wait ..." 이라는 메시지를 화면에 표시한다.
+  - 이미지 로딩이 끝나면 paintIcon(), getWidth(), getHeight() 를 비롯한 모든 메서드 호출을 이미지 아이콘 객체에 넘긴다.
+  - 사용자가 새로운 이미지를 요청하면 프록시를 새로 만들고 위 과정을 반복한다.
+  
+- ImageProxy
+
+```java
+class ImageProxy implements Icon {
+  ImageIcon imageIcon;
+  URL imageURL;
+  Thread retrievalThread;
+  boolean retrieving = false;
+  
+  public ImageProxy(URL url) {
+    imageURL = url;
+  }
+  
+  public int getIconWidth() {
+    if(imageIcon != null) {
+      return imageIcon.getIconWidth();
+    } else {
+      return 800;
+    }
+  }
+
+  public int getIconHeight() {
+    if(imageIcon != null) {
+      return imageIcon.getIconHeight();
+    } else {
+      return 600;
+    }
+  }
+  
+  public void paintIcon(final Component c, Graphics g, int x, int y) {
+    if(imageIcon != null) {
+      // 아이콘이 준비된 경우 그 아이콘 객체의 메서드를 호출
+      imageIcon.paintIcon(c, g, x, y);
+    } else {
+      // 아이콘이 준비되지 않은 경우 메시지 출력
+      g.drawString("Loading CD cover, please waite ...", x+300, y+190);
+      if(!retrieving) {
+        retrieving = true;
+        // 진짜 아이콘 이미지를 로딩하는 부분
+        retrievalThread = new Thread(new Runnable() {
+          public void run() {
+            try {
+              imageIcon = new ImageIcon(imageURL, "CD cover");
+              c.repaing();
+            } catch(Exception e) {
+              e.printStackTrace();
+            }
+          }
+        });
+        retrievalThread.start();
+      }
+    }
+  }
+
+}
+```
+
+- CD 커버 뷰어 테스트
+
+```java
+public class ImageProxyTestDrive {
+  ImageComponent imageComponent;
+  public static void main(String[] args) throws Exception {
+    ImageProxyTestDrive testDrive = new ImageProxyTestDrive();
+  }
+  
+  public ImageProxyTestDrive() throws Exception {
+    // 프레임 및 메뉴 설정
+    
+    Icon icon = new ImageProxy(initialURL);
+    imageComponent = new ImageComponent(icon);
+    frame.getContentPane().add(imageComponent);
+  }
+}
+```
+
+## 동적 프록시와 보호 프록시
+
+자바에는 프록시 기능이 내장되어 있다. `java.lang.reflect` 에 들어있다. 실제 프록시 클래스는 실행 중에 생성되기 때문에 이러한 자바 기술을 `동적 프록시(dynamic proxy)`라고 부른다.
+
+자바의 동적 프록시를 이용해서 보호 프록시를 만들 수 있다.
+
+- Subject Interface
+- Real Subject
+- Proxy
+- InvocationHandler Interface
+- Real InvocationHandler
+
+Proxy 클래스는 자바에 의해 생성되며 Subject 인터페이스 전체를 구현한다. Real InvocationHandler 는 Proxy 객체에 대한 모든 메서드 호출을 전달 받는다. Real InvocationHandler 에서 Real Subject 객체에 있는 메서드에 대한 접근을 제어한다.
+
+- 객체마을 결혼 정보
+
+```java
+public interface PersonBean {
+  String getName();
+  String getGender();
+  String getInterests();
+  int getHotOrNotRating();
+  
+  void setName(String name);
+  void setGender(String gender);
+  void setInterests(String interests);
+  void setHotOrNotRating(int rating);
+}
+```
+
+- Real Subject
+
+```java
+public class PersonBeanImpl implements PersonBean {
+  String name;
+  String gender;
+  String interests;
+  int rating;
+  int ratingCount = 0;
+  
+  // 기타 Getter Setter 메서드
+}
+```
+
+- InvocationHandler Interface
+  - invoke() 메서드 하나만 가지고 있다.
+  - 프록시의 어떤 메서드가 호출되든 무조건 핸들러의 invoke() 메서드가 호출된다.
+ 
+- Real InvocationHandler
+
+```java
+import java.lang.reflect.*;
+
+public class OwnerInfocationHandler implements InvocationHandler {
+  PersonBean person;
+  
+  public OwnerInfocationHandler(PersonBean person) {
+    this.person = person;
+  }
+  
+  public Object invoke(Object proxy, Method method, Object[] args) throws IllegalAccessException {
+    try {
+      if(method.getName().startsWith("get")) {
+        return method.invoke(person, args); // Getter 메서드의 경우 주 객체의 메서드 호출
+      } else if(method.getName().equals("setHotOrNotRating")) {
+        throw new IllegalAccessException();
+      } else if(method.getName().startsWith("set")) {
+        return method.invoke(person, args); // Setter 메서드의 경우 주 객체의 메서드 호출
+      } 
+    } catch(InvocationTargetException e) { // 진짜 Real Subject 에서 예외를 던졌을 때
+      e.printStackTrace();
+    }
+    return null; // 다른 메서드가 호출되는 경우
+  }
+}
+```
