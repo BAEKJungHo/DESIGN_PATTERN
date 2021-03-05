@@ -88,7 +88,7 @@ public class SeeMoreService {
         String strategyKey = SeeMore.findStrategyKey(dto.getStrategyKey()); 
         if(strategyKey == null) {
             // "더보기 호출 중 올바르지 않은 값으로 인해 에러가 발생하였습니다."
-            throw new ShowUserMessageException(Message.ERROR_SEE_MORE.getMsg()));
+            throw new IllegalArgumentException(Message.NOT_FOUND_STRATEGY);
         }
         SeeMoreStrategy strategy = strategyMap.get(strategyKey);
 
