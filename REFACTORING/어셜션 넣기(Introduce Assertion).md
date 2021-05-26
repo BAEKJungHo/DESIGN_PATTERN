@@ -98,3 +98,7 @@ PropertyValidator.requiredValueValidate("seq", "기본키는 빈 값이 올 수 
   - 어설션 기능을 사용할 수 있는 Assert 클래스를 작성하자.
 - 어설션이 실패하더라도 코드가 작동하는지 항상 자문해보고 어설션 실패에도 코드가 돌아간다면 그 어설션은 삭제하자.
 - 어설션 안에 중복 코드가 안생기게 주의하자.
+
+## References
+
+- [Effective Java. 매개변수가 유효한지 검사하라](https://github.com/BAEKJungHo/effectiveJava/blob/master/%EB%A9%94%EC%84%9C%EB%93%9C/49.%20%EB%A7%A4%EA%B0%9C%EB%B3%80%EC%88%98%EA%B0%80%20%EC%9C%A0%ED%9A%A8%ED%95%9C%EC%A7%80%20%EA%B2%80%EC%82%AC%ED%95%98%EB%9D%BC.md)
