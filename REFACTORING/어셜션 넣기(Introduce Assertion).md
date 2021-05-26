@@ -58,40 +58,6 @@ double getExpenseLimit() {
 }
 ```
 
-## 속성값 검증(필수값, 기본키 등)
-
-```java
-public class PropertyValidator {
-
-    /**
-     * 필수값 Validate - Integer version
-     * @param requiredValue
-     * @param message
-     */
-    public static void requiredValueValidate(Integer requiredValue, String message) {
-        if(requiredValue == null) {
-            throw new ShowUserMessageException(message);
-        }
-    }
-
-    /**
-     * 필수값 Validate - String version
-     * @param requiredValue
-     * @param message
-     */
-    public static void requiredValueValidate(String requiredValue, String message) {
-        if(StringUtils.isBlank(requiredValue)) {
-            throw new ShowUserMessageException(message);
-        }
-    }
-
-}
-```
-
-```java
-PropertyValidator.requiredValueValidate("seq", "기본키는 빈 값이 올 수 없습니다.");
-```
-
 ## How
 
 - 어떤 조건이 참으로 전제된다면 어설션을 넣어 그 전제를 드러내자
