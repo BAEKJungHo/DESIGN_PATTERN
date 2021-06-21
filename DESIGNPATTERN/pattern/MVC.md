@@ -10,3 +10,7 @@
 - 모델2
   - MVC 를 웹 애플리케이션에 맞게 적용한 디자인이다.
   - 컨트롤러는 서블릿으로 구현되고, 뷰는 JSP/HTML 로 구현된다.
+
+## MVC Design Pattern
+
+[MVC Design Pattern](https://www.geeksforgeeks.org/mvc-design-pattern/)
