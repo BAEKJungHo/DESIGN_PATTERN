@@ -443,6 +443,8 @@ public class ImageProxyTestDrive {
 
 ## 동적 프록시와 보호 프록시
 
+> [The Java Manipulate Code Dynamic Proxy](https://github.com/BAEKJungHo/the_java_manipulate_code#4%EC%9E%A5--%EB%8B%A4%EC%9D%B4%EB%82%98%EB%AF%B9-%ED%94%84%EB%A1%9D%EC%8B%9C)
+
 자바에는 프록시 기능이 내장되어 있다. `java.lang.reflect` 에 들어있다. 실제 프록시 클래스는 실행 중에 생성되기 때문에 이러한 자바 기술을 `동적 프록시(dynamic proxy)`라고 부른다.
 
 자바의 동적 프록시를 이용해서 보호 프록시를 만들 수 있다.
