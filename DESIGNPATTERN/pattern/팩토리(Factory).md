@@ -267,3 +267,79 @@ public abastract class Pizza {
 
 }
 ```
+
+## 정적 팩터리 메서드(static factory method)
+
+정적 팩토리 메서드란 `객체 생성의 역할을 하는 클래스 메서드` 를 의미한다.
+
+- java.time.LocalTime 의 정적 팩터리 메서드
+
+```java
+public static LocalTime of(int hour, int minute) {
+  ChronoField.HOUR_OF_DAY.checkValidValue((long)hour);
+  if (minute == 0) {
+    return HOURS[hour];
+  } else {
+    ChronoField.MINUTE_OF_HOUR.checkValidValue((long)minute);
+    return new LocalTime(hour, minute, 0, 0);
+  }
+}
+
+// hour, minutes 을 인자로 받아서 9시 30분을 의미하는 LocalTime 객체를 반환한다.
+LocalTime openTime = LocalTime.of(9, 30); 
+```
+
+
+### 생성자와의 차이 점
+
+Effective Java 에서 가장 첫 번째로 소개되는 내용이 [생성자 대신 정적 팩토리 메서드를 고려하라](https://github.com/BAEKJungHo/effectiveJava/blob/master/%EA%B0%9D%EC%B2%B4%20%EC%83%9D%EC%84%B1%EA%B3%BC%20%ED%8C%8C%EA%B4%B4/01.%20%EC%83%9D%EC%84%B1%EC%9E%90%20%EB%8C%80%EC%8B%A0%20%EC%A0%95%EC%A0%81%20%ED%8C%A9%ED%84%B0%EB%A6%AC%20%EB%A9%94%EC%84%9C%EB%93%9C%EB%A5%BC%20%EA%B3%A0%EB%A0%A4%ED%95%98%EB%9D%BC.md#%EC%83%9D%EC%84%B1%EC%9E%90-%EB%8C%80%EC%8B%A0-%EC%A0%95%EC%A0%81-%ED%8C%A9%ED%84%B0%EB%A6%AC-%EB%A9%94%EC%84%9C%EB%93%9C%EB%A5%BC-%EA%B3%A0%EB%A0%A4%ED%95%98%EB%9D%BC) 이다.
+
+정적 팩터리 메서드(static factory method) 가 생성자보다 우위를 차지하는 점은 다음과 같다.
+
+#### 이름을 가질 수 있다.
+
+createLottoNumber, createCar 등 이름을 가지게되어 `가독성`이 좋아지고, `객체 생성의 목적`을 나타낼 수 있다.
+
+#### 호출할 때마다 새로운 객체를 생성할 필요가 없다.
+
+enum 과 같이 자주 사용되는 요소의 개수가 정해져있다면 해당 개수만큼 미리 생성해놓고 조회([객체 캐싱](https://github.com/BAEKJungHo/TIL/blob/master/Java/Optimization/%EA%B0%9D%EC%B2%B4%20%EC%BA%90%EC%8B%B1(Objects%20Caching).md))할 수 있는 구조로 만들수 있다. 
+
+생성자의 접근 제한자를 private 으로 설정하면 객체 생성을 정적 팩터리 메서드로만 가능하게하여, 객체 생성을 제한할 수 있다.
+
+#### 하위 자료형 객체를 반환할 수 있다.
+
+- Super Class : Vehicle
+- Sub Class : Car, Airplane, Train
+
+클래스가 다음과 같은 구조로 되어있을 때, 여행지에 따라 탈것이 결정되는 정적 팩터리 메서드를 만들 수 있다.
+
+```java
+public class Vehicle {
+  ...
+  public static Vehicle(String country) {
+    if(country.equals("Cesko")) {
+      return new Airplane();
+    }
+    ...
+  }
+  ...
+}
+```
+
+#### 객체 생성을 캡슐화 할 수 있다.
+
+생성자를 클래스의 메서드 안으로 숨기면서 내부 상태를 외부에 드러낼 필요없이 객체 생성 인터페이스 단순화 시킬 수 있다.
+
+```java
+Car carDto = CarDto.from(car); // 정적 팩토리 메서드를 쓴 경우
+CarDto carDto = new CarDto(car.getName(), car.getPosition); // 생성자를 쓴 경우, 내부 구현이 다 드러난다.
+```
+
+### 네이밍 컨벤션
+
+- `from` : 하나의 매개 변수를 받아서 객체를 생성.
+- `of` : 여러개의 매개 변수를 받아서 객체를 생성.
+- `getInstance | instance` : 인스턴스를 생성. 이전에 반환했던 것과 같을 수 있음.
+- `newInstance | create` : 새로운 인스턴스를 생성.
+- `get[OtherType]` : 다른 타입의 인스턴스를 생성. 이전에 반환했던 것과 같을 수 있음.
+- `new[OtherType]` : 다른 타입의 새로운 인스턴스를 생성.
