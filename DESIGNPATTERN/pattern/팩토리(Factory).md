@@ -153,7 +153,7 @@ public class NYPizzaStore extends PizzaStore {
 - 피자 클래스
 
 ```java
-public abstract class Pizaa {
+public abstract class Pizza {
   String name;
   String dough;
   Strin sauce;
